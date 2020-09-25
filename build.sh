@@ -1,10 +1,10 @@
-export PATH="$HOME/proton/bin:$PATH"
+export PATH="/home/clev_fr/silont-clang/bin:$PATH"
 SECONDS=0
-ZIPNAME="QuicksilveR-ginkgo-$(date '+%Y%m%d-%H%M').zip"
+ZIPNAME="MegonoOseng-ginkgo-$(date '+%Y%m%d-%H%M').zip"
 
-if ! [ -d "$HOME/proton" ]; then
+if ! [ -d "/home/clev_fr/silont-clang" ]; then
 echo "Proton clang not found! Cloning..."
-if ! git clone -q https://github.com/kdrag0n/proton-clang ~/proton; then
+if ! git clone -q https://github.com/kdrag0n/proton-clang ~/silont-clang; then
 echo "Cloning failed! Aborting..."
 exit 1
 fi
@@ -23,7 +23,7 @@ make -j16 O=out ARCH=arm64 CC=clang LD=ld.lld AR=llvm-ar AS=llvm-as NM=llvm-nm O
 fi
 
 if [ -f "out/arch/arm64/boot/Image.gz-dtb" ]; then
-git clone -q https://github.com/ghostrider-reborn/AnyKernel3
+git clone -q https://github.com/farkhanclev/AnyKernel3.git
 cp out/arch/arm64/boot/Image.gz-dtb AnyKernel3
 rm -f *zip
 cd AnyKernel3
@@ -40,3 +40,4 @@ rm -rf out
 else
 echo -e "\nCompilation failed!"
 fi
+
