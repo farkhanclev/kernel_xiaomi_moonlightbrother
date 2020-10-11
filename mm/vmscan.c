@@ -3034,14 +3034,8 @@ static bool allow_direct_reclaim(pg_data_t *pgdat)
 
 	/* kswapd must be awake if processes are being throttled */
 	if (!wmark_ok && waitqueue_active(&pgdat->kswapd_wait)) {
-<<<<<<< HEAD
 		pgdat->kswapd_highest_zoneidx = min(pgdat->kswapd_highest_zoneidx,
 						(enum zone_type)ZONE_NORMAL);
-=======
-		if (READ_ONCE(pgdat->kswapd_classzone_idx) > ZONE_NORMAL)
-			WRITE_ONCE(pgdat->kswapd_classzone_idx, ZONE_NORMAL);
-
->>>>>>> f01cd256674cdcf18e49dec3f1960d3e5acf1932
 		wake_up_interruptible(&pgdat->kswapd_wait);
 	}
 
@@ -3551,15 +3545,9 @@ out:
 static enum zone_type kswapd_highest_zoneidx(pg_data_t *pgdat,
 					   enum zone_type prev_highest_zoneidx)
 {
-<<<<<<< HEAD
 	if (pgdat->kswapd_highest_zoneidx == MAX_NR_ZONES)
 		return prev_highest_zoneidx;
 	return pgdat->kswapd_highest_zoneidx;
-=======
-	enum zone_type curr_idx = READ_ONCE(pgdat->kswapd_classzone_idx);
-
-	return curr_idx == MAX_NR_ZONES ? prev_classzone_idx : curr_idx;
->>>>>>> f01cd256674cdcf18e49dec3f1960d3e5acf1932
 }
 
 static void kswapd_try_to_sleep(pg_data_t *pgdat, int alloc_order, int reclaim_order,
@@ -3603,16 +3591,8 @@ static void kswapd_try_to_sleep(pg_data_t *pgdat, int alloc_order, int reclaim_o
 		 * the previous request that slept prematurely.
 		 */
 		if (remaining) {
-<<<<<<< HEAD
 			pgdat->kswapd_highest_zoneidx = kswapd_highest_zoneidx(pgdat, highest_zoneidx);
 			pgdat->kswapd_order = max(pgdat->kswapd_order, reclaim_order);
-=======
-			WRITE_ONCE(pgdat->kswapd_classzone_idx,
-				   kswapd_classzone_idx(pgdat, classzone_idx));
-
-			if (READ_ONCE(pgdat->kswapd_order) < reclaim_order)
-				WRITE_ONCE(pgdat->kswapd_order, reclaim_order);
->>>>>>> f01cd256674cdcf18e49dec3f1960d3e5acf1932
 		}
 
 		finish_wait(&pgdat->kswapd_wait, &wait);
@@ -3694,7 +3674,6 @@ static int kswapd(void *p)
 	tsk->flags |= PF_MEMALLOC | PF_SWAPWRITE | PF_KSWAPD;
 	set_freezable();
 
-<<<<<<< HEAD
 	pgdat->kswapd_order = 0;
 	pgdat->kswapd_highest_zoneidx = MAX_NR_ZONES;
 	for ( ; ; ) {
@@ -3703,33 +3682,16 @@ static int kswapd(void *p)
 		alloc_order = reclaim_order = pgdat->kswapd_order;
 		highest_zoneidx = kswapd_highest_zoneidx(pgdat,
 							highest_zoneidx);
-=======
-	WRITE_ONCE(pgdat->kswapd_order, 0);
-	WRITE_ONCE(pgdat->kswapd_classzone_idx, MAX_NR_ZONES);
-	for ( ; ; ) {
-		bool ret;
-
-		alloc_order = reclaim_order = READ_ONCE(pgdat->kswapd_order);
-		classzone_idx = kswapd_classzone_idx(pgdat, classzone_idx);
->>>>>>> f01cd256674cdcf18e49dec3f1960d3e5acf1932
 
 kswapd_try_sleep:
 		kswapd_try_to_sleep(pgdat, alloc_order, reclaim_order,
 					highest_zoneidx);
 
-<<<<<<< HEAD
 		/* Read the new order and highest_zoneidx */
 		alloc_order = reclaim_order = pgdat->kswapd_order;
 		highest_zoneidx = kswapd_highest_zoneidx(pgdat, highest_zoneidx);
 		pgdat->kswapd_order = 0;
 		pgdat->kswapd_highest_zoneidx = MAX_NR_ZONES;
-=======
-		/* Read the new order and classzone_idx */
-		alloc_order = reclaim_order = READ_ONCE(pgdat->kswapd_order);
-		classzone_idx = kswapd_classzone_idx(pgdat, classzone_idx);
-		WRITE_ONCE(pgdat->kswapd_order, 0);
-		WRITE_ONCE(pgdat->kswapd_classzone_idx, MAX_NR_ZONES);
->>>>>>> f01cd256674cdcf18e49dec3f1960d3e5acf1932
 
 		ret = try_to_freeze();
 		if (kthread_should_stop())
@@ -3780,23 +3742,13 @@ void wakeup_kswapd(struct zone *zone, int order, enum zone_type highest_zoneidx)
 		return;
 
 	pgdat = zone->zone_pgdat;
-	curr_idx = READ_ONCE(pgdat->kswapd_classzone_idx);
-
-	if (curr_idx == MAX_NR_ZONES || curr_idx < classzone_idx)
-		WRITE_ONCE(pgdat->kswapd_classzone_idx, classzone_idx);
-
-	if (READ_ONCE(pgdat->kswapd_order) < order)
-		WRITE_ONCE(pgdat->kswapd_order, order);
-
-<<<<<<< HEAD
+	
 	if (pgdat->kswapd_highest_zoneidx == MAX_NR_ZONES)
 		pgdat->kswapd_highest_zoneidx = highest_zoneidx;
 	else
 		pgdat->kswapd_highest_zoneidx = max(pgdat->kswapd_highest_zoneidx,
 						  highest_zoneidx);
 	pgdat->kswapd_order = max(pgdat->kswapd_order, order);
-=======
->>>>>>> f01cd256674cdcf18e49dec3f1960d3e5acf1932
 	if (!waitqueue_active(&pgdat->kswapd_wait))
 		return;
 

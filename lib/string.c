@@ -244,21 +244,12 @@ EXPORT_SYMBOL(strscpy);
  * @src: pointer to the beginning of string being copied from. Must not overlap
  *       dest.
  *
-<<<<<<< HEAD
  * stpcpy differs from strcpy in a key way: the return value is the new
  * %NUL-terminated character. (for strcpy, the return value is a pointer to
  * src. This interface is considered unsafe as it doesn't perform bounds
  * checking of the inputs. As such it's not recommended for usage. Instead,
  * its definition is provided in case the compiler lowers other libcalls to
  * stpcpy.
-=======
- * stpcpy differs from strcpy in a key way: the return value is a pointer
- * to the new %NUL-terminating character in @dest. (For strcpy, the return
- * value is a pointer to the start of @dest). This interface is considered
- * unsafe as it doesn't perform bounds checking of the inputs. As such it's
- * not recommended for usage. Instead, its definition is provided in case
- * the compiler lowers other libcalls to stpcpy.
->>>>>>> f01cd256674cdcf18e49dec3f1960d3e5acf1932
  */
 char *stpcpy(char *__restrict__ dest, const char *__restrict__ src);
 char *stpcpy(char *__restrict__ dest, const char *__restrict__ src)

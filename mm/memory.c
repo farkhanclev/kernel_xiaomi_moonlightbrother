@@ -2742,25 +2742,8 @@ static int wp_page_copy(struct vm_fault *vmf)
 		new_page = alloc_page_vma(GFP_HIGHUSER_MOVABLE, vma,
 				vmf->address);
 		if (!new_page)
-<<<<<<< HEAD
 			goto out;
 		cow_user_page(new_page, old_page, vmf->address, vma);
-=======
-			goto oom;
-
-		if (!cow_user_page(new_page, old_page, vmf)) {
-			/*
-			 * COW failed, if the fault was solved by other,
-			 * it's fine. If not, userspace would re-fault on
-			 * the same address and we will handle the fault
-			 * from the second attempt.
-			 */
-			put_page(new_page);
-			if (old_page)
-				put_page(old_page);
-			return 0;
-		}
->>>>>>> f01cd256674cdcf18e49dec3f1960d3e5acf1932
 	}
 
 	if (mem_cgroup_try_charge(new_page, mm, GFP_KERNEL, &memcg, false))
